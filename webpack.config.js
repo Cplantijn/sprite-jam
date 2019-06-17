@@ -3,8 +3,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: path.resolve(__dirname, 'client/js/index.jsx'),
+  entry: [
+    'react-hot-loader/patch',
+    path.resolve(__dirname, 'client/js/index.jsx')
+  ],
   devServer: {
+    hot: true,
     contentBase: path.resolve(__dirname, 'dist'),
     historyApiFallback: true
   },
