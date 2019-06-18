@@ -1,13 +1,13 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import Lobby from '~components/Lobby';
+import GameStage from '~components/GameStage';
 
 export default class Routes extends React.PureComponent {
   render() {
     return (
       <Switch>
-        <Route path="/lobby" component={Lobby} />
-        <Redirect to="/lobby" />
+        <Route path="/" component={GameStage} />
+        <Redirect to="/" />
       </Switch>
     );
   }

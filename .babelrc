@@ -16,7 +16,9 @@
       "module-resolver",
       {
         "alias": {
-          "~components": "./client/js/components",
+          "~components": "./client/components",
+          "~config": "./client/config.js",
+          "~helpers": "./client/helpers"
         }
       }
     ]

@@ -1,15 +1,15 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: [
-    'react-hot-loader/patch',
-    path.resolve(__dirname, 'client/js/index.jsx')
-  ],
+  entry: path.resolve(__dirname, 'client/index.jsx'),
   devServer: {
     hot: true,
-    contentBase: path.resolve(__dirname, 'dist'),
+    writeToDisk: (filePath) => {
+      return /\/assets\/.*/.test(filePath);
+    },
     historyApiFallback: true
   },
   resolve: {
@@ -46,7 +46,12 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'client/static/index.html')
-    })
+      template: path.resolve(__dirname, 'client/static/index.html'),
+      inject: false
+    }),
+    new CopyPlugin([{
+      from: path.resolve(__dirname, 'client/assets'),
+      to: 'assets'
+    }])
   ]
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import Routes from '../routes';
 
-import '../../styles/base.scss';
+import '../styles/base.scss';
 
 class App extends React.PureComponent {
   render() {
