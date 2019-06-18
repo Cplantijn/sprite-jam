@@ -10,6 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.19",
+    "@fortawesome/free-solid-svg-icons": "^5.9.0",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "express": "^4.17.1",
+    "react-device-detect": "^1.6.2",
+    "react-responsive": "^7.0.0",
     "squeeze-js": "^1.0.3",
     "ws": "^7.0.1"
   },

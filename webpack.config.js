@@ -10,6 +10,7 @@ module.exports = {
     writeToDisk: (filePath) => {
       return /\/assets\/.*/.test(filePath);
     },
+    host: '0.0.0.0',
     historyApiFallback: true
   },
   resolve: {

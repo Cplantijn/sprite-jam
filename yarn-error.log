@@ -1,26 +1,26 @@
 Arguments: 
-  /Users/chris/.nvm/versions/node/v10.15.0/bin/node /usr/local/Cellar/yarn/1.13.0/libexec/bin/yarn.js add squeezejs
+  /Users/cplantijn/.nvm/versions/node/v10.13.0/bin/node /Users/cplantijn/.nvm/versions/node/v10.13.0/bin/yarn add raect-device-detect
 
 PATH: 
-  /Users/chris/.nvm/versions/node/v10.15.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/chris/.nvm/versions/node/v10.15.0/bin:/Users/chris/Library/Android/sdk/emulator:/Users/chris/Library/Android/sdk/tools:/Users/chris/Library/Android/sdk/tools/bin:/Users/chris/Library/Android/sdk/platform-tools:/Users/chris/Library/Android/sdk/emulator:/Users/chris/Library/Android/sdk/tools:/Users/chris/Library/Android/sdk/tools/bin:/Users/chris/Library/Android/sdk/platform-tools
+  /Users/cplantijn/.nvm/versions/node/v10.13.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/mysql/bin:/Users/cplantijn/Library/Android/sdk/emulator:/Users/cplantijn/Library/Android/sdk/tools:/Users/cplantijn/Library/Android/sdk/tools/bin:/Users/cplantijn/Library/Android/sdk/platform-tools:/Users/cplantijn/Library/Android/sdk/emulator:/Users/cplantijn/Library/Android/sdk/tools:/Users/cplantijn/Library/Android/sdk/tools/bin:/Users/cplantijn/Library/Android/sdk/platform-tools
 
 Yarn version: 
-  1.13.0
+  1.12.1
 
 Node version: 
-  10.15.0
+  10.13.0
 
 Platform: 
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/squeezejs: Not found
-      at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.13.0/libexec/lib/cli.js:66255:18)
-      at Request.self.callback (/usr/local/Cellar/yarn/1.13.0/libexec/lib/cli.js:129397:22)
+  Error: https://registry.npmjs.org/raect-device-detect: Not found
+      at Request.params.callback [as _callback] (/Users/cplantijn/.nvm/versions/node/v10.13.0/lib/node_modules/yarn/lib/cli.js:62126:18)
+      at Request.self.callback (/Users/cplantijn/.nvm/versions/node/v10.13.0/lib/node_modules/yarn/lib/cli.js:124482:22)
       at Request.emit (events.js:182:13)
-      at Request.<anonymous> (/usr/local/Cellar/yarn/1.13.0/libexec/lib/cli.js:130369:10)
+      at Request.<anonymous> (/Users/cplantijn/.nvm/versions/node/v10.13.0/lib/node_modules/yarn/lib/cli.js:125454:10)
       at Request.emit (events.js:182:13)
-      at IncomingMessage.<anonymous> (/usr/local/Cellar/yarn/1.13.0/libexec/lib/cli.js:130291:12)
+      at IncomingMessage.<anonymous> (/Users/cplantijn/.nvm/versions/node/v10.13.0/lib/node_modules/yarn/lib/cli.js:125376:12)
       at Object.onceWrapper (events.js:273:13)
       at IncomingMessage.emit (events.js:187:15)
       at endReadableNT (_stream_readable.js:1094:12)
@@ -39,6 +39,8 @@ npm manifest:
     "author": "",
     "license": "ISC",
     "dependencies": {
+      "react-responsive": "^7.0.0",
+      "squeeze-js": "^1.0.3",
       "ws": "^7.0.1"
     },
     "devDependencies": {
@@ -60,6 +62,7 @@ npm manifest:
       "react-konva": "^16.8.7-2",
       "react-router": "^5.0.1",
       "react-router-dom": "^5.0.1",
+      "react-spring": "^8.0.25",
       "sass-loader": "^7.1.0",
       "sass-resources-loader": "^2.0.1",
       "style-loader": "^0.23.1",
@@ -748,7 +751,7 @@ Lockfile:
       "@babel/plugin-transform-react-jsx-self" "^7.0.0"
       "@babel/plugin-transform-react-jsx-source" "^7.0.0"
   
-  "@babel/runtime@^7.1.2", "@babel/runtime@^7.4.0":
+  "@babel/runtime@^7.1.2", "@babel/runtime@^7.3.1", "@babel/runtime@^7.4.0":
     version "7.4.5"
     resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
     integrity sha512-TuI4qpWZP6lGOGIuGWtp9sPluqYICmbk8T/1vpSysqJxRPkudh/ofFWyqdcMsDf2s7KvDL4/YHgKyvcS3g9CJQ==
@@ -1915,6 +1918,11 @@ Lockfile:
       postcss-modules-values "^3.0.0"
       postcss-value-parser "^4.0.0"
       schema-utils "^1.0.0"
+  
+  css-mediaquery@^0.1.2:
+    version "0.1.2"
+    resolved "https://registry.yarnpkg.com/css-mediaquery/-/css-mediaquery-0.1.2.tgz#6a2c37344928618631c54bd33cedd301da18bea0"
+    integrity sha1-aiw3NEkoYYYxxUvTPO3TAdoYvqA=
   
   css-select@^1.1.0:
     version "1.2.0"
@@ -3091,6 +3099,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
     integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
   
+  hyphenate-style-name@^1.0.0:
+    version "1.0.3"
+    resolved "https://registry.yarnpkg.com/hyphenate-style-name/-/hyphenate-style-name-1.0.3.tgz#097bb7fa0b8f1a9cf0bd5c734cf95899981a9b48"
+    integrity sha512-EcuixamT82oplpoJ2XU4pDtKGWQ7b00CD9f1ug9IaQ3p1bkHMiKCZ9ut9QDI6qsa6cpUuB+A/I+zLtdNK4n2DQ==
+  
   iconv-lite@0.4.24, iconv-lite@^0.4.4:
     version "0.4.24"
     resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -3721,6 +3734,13 @@ Lockfile:
     integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
     dependencies:
       object-visit "^1.0.0"
+  
+  matchmediaquery@^0.3.0:
+    version "0.3.0"
+    resolved "https://registry.yarnpkg.com/matchmediaquery/-/matchmediaquery-0.3.0.tgz#6f672bcdbc44de16825c6917fbcdcfb9b82607b1"
+    integrity sha512-u0dlv+VENJ+3YepvwSPBieuvnA6DWfaYa/ctwysAR13y4XLJNyt7bEVKzNj/Nvjo+50d88Pj+xL9xaSo6JmX/w==
+    dependencies:
+      css-mediaquery "^0.1.2"
   
   md5.js@^1.3.4:
     version "1.3.5"
@@ -4673,7 +4693,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
     integrity sha1-mEcocL8igTL8vdhoEputEsPAKeM=
   
-  prop-types@^15.6.1, prop-types@^15.6.2:
+  prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
     version "15.7.2"
     resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
     integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -4875,6 +4895,15 @@ Lockfile:
       prop-types "^15.6.2"
       scheduler "^0.13.6"
   
+  react-responsive@^7.0.0:
+    version "7.0.0"
+    resolved "https://registry.yarnpkg.com/react-responsive/-/react-responsive-7.0.0.tgz#0abde0ccbb50e5e8407e3d61dd4696447e7ebd3c"
+    integrity sha512-RukaKD+UI/MIR+P8eUgVGURfiCafRvvcVnq41scT0eEQWHwDGliH/OAlrwIr1oyz8aKLGroZa+U8mTZV5ihPfA==
+    dependencies:
+      hyphenate-style-name "^1.0.0"
+      matchmediaquery "^0.3.0"
+      prop-types "^15.6.1"
+  
   react-router-dom@^5.0.1:
     version "5.0.1"
     resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-5.0.1.tgz#ee66f4a5d18b6089c361958e443489d6bab714be"
@@ -4903,6 +4932,14 @@ Lockfile:
       react-is "^16.6.0"
       tiny-invariant "^1.0.2"
       tiny-warning "^1.0.0"
+  
+  react-spring@^8.0.25:
+    version "8.0.25"
+    resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-8.0.25.tgz#3b19c370e26b0a62630390c5daf3092e714805c4"
+    integrity sha512-KLSLI9ccpoxvxzCbtTqSOHNHhndxAeEcHsgFZoyybP3GpGh0axmtauUAH8c3XkozIW8r9gScvrCWw3F1EPIcBw==
+    dependencies:
+      "@babel/runtime" "^7.3.1"
+      prop-types "^15.5.8"
   
   react@^16.8.6:
     version "16.8.6"
@@ -5585,6 +5622,11 @@ Lockfile:
     integrity sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==
     dependencies:
       extend-shallow "^3.0.0"
+  
+  squeeze-js@^1.0.3:
+    version "1.0.3"
+    resolved "https://registry.yarnpkg.com/squeeze-js/-/squeeze-js-1.0.3.tgz#372a3b4f6666ee433b7e8848fe68fd2e0d76cde9"
+    integrity sha1-Nyo7T2Zm7kM7fohI/mj9Lg12zek=
   
   sshpk@^1.7.0:
     version "1.16.1"

@@ -40,7 +40,7 @@ export default class GameStage extends React.PureComponent {
     if (!canvasRef) return;
 
     const backgroundImage = new Image();
-    backgroundImage.src = 'assets/images/background.png';
+    backgroundImage.src = '/assets/images/background.png';
 
     backgroundImage.addEventListener('load', () => {
       const canvasCtx = canvasRef.getContext('2d');
@@ -75,7 +75,7 @@ export default class GameStage extends React.PureComponent {
           />
         </Layer>
         <Layer>
-          <PlayerSprite name="ryu" />
+          <PlayerSprite name="ryu" stageDimens={stageDimens} />
         </Layer>
       </Stage>
     );

@@ -1,0 +1,58 @@
+.fat-message {
+  text-align: center;
+  font-size: 30px;
+}
+
+.smartphone-icon {
+  margin-bottom: 20px;
+}
+
+.gamepad-controller {
+  flex: 1;
+  height: 100%;
+  display: flex;
+}
+
+.ready-container {
+  margin-top: 2rem;
+  margin-bottom: 6rem;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+}
+
+.d-pad-controller {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  button {
+    &:active {
+      svg {
+        path {
+          fill: white;
+        }
+      }
+    }
+  }
+}
+
+.action-controller {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  button {
+    height: 7rem;
+    width: 7rem;
+    border-radius: 7rem;
+    background-color: #990000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:active {
+      background-color: red
+    }
+  }
+}
