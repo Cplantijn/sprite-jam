@@ -1,19 +1,26 @@
 import config from '~config';
 
+function* getHole(arr) {
+  let i = arr.length;
+
+  while (i--) {
+    yield arr.splice(Math.floor(Math.random() * (i + 1)), 1)[0];
+  }
+}
+
 export default function(numHoles) {
   const angryColumns = [];
+  const holes = [];
 
-  for (let i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
+  for (var i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
     angryColumns.push(i);
   }
 
-  let holes = [];
+  const randomHole = getHole(angryColumns);
 
-  for (let j = angryColumns.length - 1; (j >= 0 && numHoles > holes.length); j--) {
-    const splicePosition = Math.floor(Math.random() * angryColumns.length);
-    holes.push(angryColumns[splicePosition]);
-    angryColumns.splice(splicePosition, 1);
+  for (var j = 0; j < numHoles; j++) {
+    holes.push(randomHole.next().value);
   }
-  
+
   return holes;
 }

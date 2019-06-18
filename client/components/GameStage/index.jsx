@@ -2,6 +2,7 @@ import React from 'react';
 import sq from 'squeeze-js';
 import { Stage, Layer } from 'react-konva';
 import PlayerSelection from '~components/PlayerSelection';
+import PlayerSprite from '~components/PlayerSprite';
 import config from '~config';
 import AngryBlockRow from '~components/AngryBlockRow';
 import getRandomHolePositions from '~helpers/getRandomHolePositions';
@@ -49,7 +50,7 @@ export default class GameStage extends React.PureComponent {
 
   handleAngryBlocksReady = () => {
     this.setState({
-      angryHoles: getRandomHolePositions(2)
+      angryHoles: getRandomHolePositions(4)
     }, () => setTimeout(this.angryBlockRowRef.current.dropRow, 2000));
   }
 
@@ -72,6 +73,9 @@ export default class GameStage extends React.PureComponent {
             onReady={this.handleAngryBlocksReady}
             onSlammed={this.handleAngryBlocksSlammed}
           />
+        </Layer>
+        <Layer>
+          <PlayerSprite name="ryu" />
         </Layer>
       </Stage>
     );

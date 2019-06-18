@@ -10,5 +10,5 @@ export default {
   }, {
     name: 'blanka'
   }],
-  ANGRY_BLOCK_COLUMNS: 14
+  ANGRY_BLOCK_COLUMNS: 12
 };
