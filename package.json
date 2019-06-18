@@ -32,6 +32,7 @@
     "react-konva": "^16.8.7-2",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
+    "react-spring": "^8.0.25",
     "sass-loader": "^7.1.0",
     "sass-resources-loader": "^2.0.1",
     "style-loader": "^0.23.1",

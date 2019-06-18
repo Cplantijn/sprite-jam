@@ -18,7 +18,8 @@
         "alias": {
           "~components": "./client/components",
           "~config": "./client/config.js",
-          "~helpers": "./client/helpers"
+          "~helpers": "./client/helpers",
+          "~constants": "./client/constants"
         }
       }
     ]

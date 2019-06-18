@@ -1,6 +1,14 @@
 export default {
   MIN_SCREEN_WIDTH: 1280,
   MIN_SCREEN_HEIGHT: 800,
-  PLAYER_COUNT: 4,
-  ANGRY_BLOCK_COLUMNS: 10
+  PLAYERS: [{
+    name: 'ryu'
+  }, {
+    name: 'ken'
+  }, {
+    name: 'deejay'
+  }, {
+    name: 'blanka'
+  }],
+  ANGRY_BLOCK_COLUMNS: 14
 };

@@ -3,14 +3,17 @@ import sq from 'squeeze-js';
 import { Stage, Layer } from 'react-konva';
 import PlayerSelection from '~components/PlayerSelection';
 import config from '~config';
-import AngryBlockRow from '../AngryBlockRow';
+import AngryBlockRow from '~components/AngryBlockRow';
+import getRandomHolePositions from '~helpers/getRandomHolePositions';
 
 export default class GameStage extends React.PureComponent {
   backgroundLayer = React.createRef();
+  angryBlockRowRef = React.createRef();
 
   state = {
     height: window.innerHeight > config.MIN_SCREEN_HEIGHT - 1 ? window.innerHeight : config.MIN_SCREEN_HEIGHT,
-    width: window.innerWidth > config.MIN_SCREEN_WIDTH - 1 ? window.innerWidth : config.MIN_SCREEN_WIDTH
+    width: window.innerWidth > config.MIN_SCREEN_WIDTH - 1 ? window.innerWidth : config.MIN_SCREEN_WIDTH,
+    angryHoles: []
   };
 
   componentDidMount() {
@@ -44,6 +47,14 @@ export default class GameStage extends React.PureComponent {
     });
   }
 
+  handleAngryBlocksReady = () => {
+    this.setState({
+      angryHoles: getRandomHolePositions(2)
+    }, () => setTimeout(this.angryBlockRowRef.current.dropRow, 2000));
+  }
+
+  handleAngryBlocksSlammed = () => setTimeout(this.angryBlockRowRef.current.raiseRow, 1000);
+
   render() {
     const stageDimens = { height: this.state.height, width: this.state.width };
 
@@ -54,7 +65,13 @@ export default class GameStage extends React.PureComponent {
           <PlayerSelection stageDimens={stageDimens}/>
         </Layer>
         <Layer>
-          <AngryBlockRow stageDimens={stageDimens}/>
+          <AngryBlockRow
+            ref={this.angryBlockRowRef}
+            holes={this.state.angryHoles}
+            stageDimens={stageDimens}
+            onReady={this.handleAngryBlocksReady}
+            onSlammed={this.handleAngryBlocksSlammed}
+          />
         </Layer>
       </Stage>
     );
