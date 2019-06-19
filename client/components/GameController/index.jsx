@@ -11,16 +11,34 @@ import './GameController.scss';
 
 export default class GameController extends React.PureComponent {
   socket = new WebSocket(config.WS_ADDRESS);
+  state = { characterAvailable: null };
 
   componentWillMount() {
     this.socket.addEventListener('message', this.handleWsMessage);
+    this.socket.addEventListener('open', () => {
+      this.socket.send(JSON.stringify({
+        playerName: this.props.match.params.playerName,
+        action: actions.CHECK_PLAYER_AVAILABLE
+      }));
+    })
   }
 
   componentWillUnmount() {
     this.socket.removeEventListener('message', this.handleWsMessage);
   }
 
-  handleWsMessage = (msg) => {
+  handleWsMessage = (msgEvent) => {
+    const msg = JSON.parse(msgEvent.data);
+
+    switch(msg.action) {
+      case actions.SEND_PLAYER_AVAILABILITY:
+        this.setState({
+          characterAvailable: !!msg.characterAvailable
+        });
+        break;
+      default:
+        // Nada
+    }
     // Set player ready notifca
   }
 
@@ -38,6 +56,41 @@ export default class GameController extends React.PureComponent {
     return (
       <button type="button" onClick={this.handleStartPressed} className="nes-btn">{label}</button>
     )
+  }
+
+  renderControllerContent = () => {
+    if (this.state.characterAvailable === null) {
+      return <h1 className="nes-text is-primary fat-message">Checking if character is available....</h1>;
+    } else if (this.state.characterAvailable === false) {
+      return (
+        <h1 className="nes-text is-error fat-message">
+          {this.props.match.params.playerName.toUpperCase()} is in play. Pick a different character or try again later.
+        </h1>
+      );
+    }
+
+    return (
+      <div className="gamepad-controller flex-column">
+        <div className="ready-container flex-center">
+          {this.renderStartButton()}
+        </div>
+        <div className="controls">
+          <div className="d-pad-controller">
+            <button>
+              <FontAwesomeIcon icon={faArrowAltCircleLeft} size="7x" color="#adafbc" />
+            </button>
+            <button>
+              <FontAwesomeIcon icon={faArrowAltCircleRight} size="7x" color="#adafbc" />
+            </button>
+          </div>
+          <div className="action-controller">
+            <button>
+              <FontAwesomeIcon icon={faFistRaised} size="4x" color="white" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   render() {
@@ -60,26 +113,7 @@ export default class GameController extends React.PureComponent {
           <h1 className="nes-text is-error fat-message">Turn your phone to landscape</h1>
         </MediaQuery>
         <MediaQuery orientation="landscape">
-          <div className="gamepad-controller flex-column">
-            <div className="ready-container flex-center">
-              {this.renderStartButton()}
-            </div>
-            <div className="controls">
-              <div className="d-pad-controller">
-                <button>
-                  <FontAwesomeIcon icon={faArrowAltCircleLeft} size="7x" color="#adafbc" />
-                </button>
-                <button>
-                  <FontAwesomeIcon icon={faArrowAltCircleRight} size="7x" color="#adafbc" />
-                </button>
-              </div>
-              <div className="action-controller">
-                <button>
-                  <FontAwesomeIcon icon={faFistRaised} size="4x" color="white" />
-                </button>
-              </div>
-            </div>
-          </div>
+          {this.renderControllerContent()}
         </MediaQuery>
       </div>
     )

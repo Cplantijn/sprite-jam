@@ -13,21 +13,34 @@ const sockets = {
 };
 
 wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    const parsedMessage = JSON.parse(message);
-
-    switch(parsedMessage.action) {
+  ws.on('message', function incoming(msgEvent) {
+    const msg = JSON.parse(msgEvent);
+    console.log({ msg})
+    switch(msg.action) {
       case actions.CLAIM_GAME_HOST:
         console.log('Game Host is being claimed...');
         sockets.HOST = ws;
         break;
+      case actions.CHECK_PLAYER_AVAILABLE:
+        ws.send(JSON.stringify({
+          action: actions.SEND_PLAYER_AVAILABILITY,
+          characterAvailable: !Boolean(sockets[msg.playerName.toUpperCase()])
+        }))
+      break;
       case actions.PLAYER_READY:
-        sockets[parsedMessage.playerName.toUpperCase()] = ws;
+        if (sockets[msg.playerName.toUpperCase()]) {
+          ws.send(JSON.stringify({
+            action: actions.SEND_PLAYER_AVAILABILITY,
+            characterAvailable: false
+          }))
+        } else {
+          sockets[msg.playerName.toUpperCase()] = ws;
 
-        sendToHost({
-          action: actions.PLAYER_READY,
-          playerName: parsedMessage.playerName
-        });
+          sendToHost({
+            action: actions.PLAYER_READY,
+            playerName: msg.playerName
+          });
+        }
         break;
       default:
         // Nada

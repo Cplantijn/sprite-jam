@@ -4,7 +4,7 @@ import PlayerStatus from '~components/PlayerStatus';
 
 const DARK_BOTTOM_RATIO = 0.145; // Black area at bottom of screen
 
-export default class PlayerSelection extends React.PureComponent {
+export default class PlayersRow extends React.PureComponent {
   render() {
     return config.PLAYERS.map((player, playerIndex) => (
       <PlayerStatus
