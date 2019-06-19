@@ -11,7 +11,7 @@ import './GameController.scss';
 
 export default class GameController extends React.PureComponent {
   socket = new WebSocket(config.WS_ADDRESS);
-  state = { characterAvailable: null };
+  state = { characterAvailable: null, attacking: false, playerClaimed: false, playerReady: false, gameActive: false };
 
   componentWillMount() {
     this.socket.addEventListener('message', this.handleWsMessage);
@@ -36,6 +36,16 @@ export default class GameController extends React.PureComponent {
           characterAvailable: !!msg.characterAvailable
         });
         break;
+      case actions.PLAYER_CLAIMED:
+        this.setState({
+          playerClaimed: true
+        });
+        break;
+      case actions.START_GAME:
+        this.setState({
+          gameActive: true
+        });
+        break;
       default:
         // Nada
     }
@@ -43,19 +53,62 @@ export default class GameController extends React.PureComponent {
   }
 
   handleStartPressed = () => {
-    this.socket.send(JSON.stringify({
-      playerName: this.props.match.params.playerName,
-      action: actions.PLAYER_READY
-    }));
+    if (this.state.playerClaimed) {
+      this.socket.send(JSON.stringify({
+        playerName: this.props.match.params.playerName,
+        action: actions.PLAYER_READY
+      }));
+    } else {
+      this.socket.send(JSON.stringify({
+        playerName: this.props.match.params.playerName,
+        action: actions.CLAIM_PLAYER
+      }));
+    }
+
   }
 
   renderStartButton() {
     const { playerName } = this.props.match.params;
-    const label = `Start as ${playerName.substring(0, 1).toUpperCase()}${playerName.substring(1)} `;
+    let label = `Claim ${playerName.substring(0, 1).toUpperCase()}${playerName.substring(1)} `;
+
+    if (this.state.playerClaimed) {
+      label = 'Ready Up';
+    }
 
     return (
       <button type="button" onClick={this.handleStartPressed} className="nes-btn">{label}</button>
     )
+  }
+
+  handleAttack = () => {
+    if (this.state.attacking) return;
+
+      this.setState({
+        attacking: true
+      }, () => {
+        this.socket.send(JSON.stringify({
+          playerName: this.props.match.params.playerName,
+          action: actions.ATTACK
+        }))
+        
+        setTimeout(() => {
+          this.setState({
+            attacking: false
+          }, () => {
+            this.socket.send(JSON.stringify({
+              playerName: this.props.match.params.playerName,
+              action: actions.STOP
+            }))
+          })
+        }, 300)
+      })
+  }
+
+  handleControllerAction = action => {
+    this.socket.send(JSON.stringify({
+      playerName: this.props.match.params.playerName,
+      action
+    }))
   }
 
   renderControllerContent = () => {
@@ -70,21 +123,29 @@ export default class GameController extends React.PureComponent {
     }
 
     return (
-      <div className="gamepad-controller flex-column">
-        <div className="ready-container flex-center">
-          {this.renderStartButton()}
-        </div>
+      <div className="gamepad-controller flex-column flex-center">
+        {!this.state.gameActive && (
+          <div className="ready-container flex-center">
+            {this.renderStartButton()}
+          </div>
+        )}
         <div className="controls">
           <div className="d-pad-controller">
-            <button>
+            <button
+              onTouchStart={() => this.handleControllerAction(actions.MOVE_LEFT)}
+              onTouchEnd={() => this.handleControllerAction(actions.STOP)}
+            >
               <FontAwesomeIcon icon={faArrowAltCircleLeft} size="7x" color="#adafbc" />
             </button>
-            <button>
+            <button
+              onTouchStart={() => this.handleControllerAction(actions.MOVE_RIGHT)}
+              onTouchEnd={() => this.handleControllerAction(actions.STOP)}
+            >
               <FontAwesomeIcon icon={faArrowAltCircleRight} size="7x" color="#adafbc" />
             </button>
           </div>
           <div className="action-controller">
-            <button>
+            <button onTouchStart={this.handleAttack}>
               <FontAwesomeIcon icon={faFistRaised} size="4x" color="white" />
             </button>
           </div>

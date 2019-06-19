@@ -11,16 +11,16 @@ function* getHole(arr) {
 export default function(numHoles) {
   const angryColumns = [];
   const holes = [];
-  return [0, 12];
-  // for (var i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
-  //   angryColumns.push(i);
-  // }
+  // return [0, 12];
+  for (var i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
+    angryColumns.push(i);
+  }
 
-  // const randomHole = getHole(angryColumns);
+  const randomHole = getHole(angryColumns);
 
-  // for (var j = 0; j < numHoles; j++) {
-  //   holes.push(randomHole.next().value);
-  // }
+  for (var j = 0; j < numHoles; j++) {
+    holes.push(randomHole.next().value);
+  }
 
-  // return holes;
+  return holes;
 }
