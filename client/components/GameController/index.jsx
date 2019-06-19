@@ -3,17 +3,40 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Redirect } from 'react-router-dom';
 import { faFistRaised, faArrowAltCircleLeft, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { isMobile } from 'react-device-detect';
+import config from '~config';
 import MediaQuery from 'react-responsive';
+import actions from '~constants/actions';
 
 import './GameController.scss';
 
 export default class GameController extends React.PureComponent {
+  socket = new WebSocket(config.WS_ADDRESS);
+
+  componentWillMount() {
+    this.socket.addEventListener('message', this.handleWsMessage);
+  }
+
+  componentWillUnmount() {
+    this.socket.removeEventListener('message', this.handleWsMessage);
+  }
+
+  handleWsMessage = (msg) => {
+    // Set player ready notifca
+  }
+
+  handleStartPressed = () => {
+    this.socket.send(JSON.stringify({
+      playerName: this.props.match.params.playerName,
+      action: actions.PLAYER_READY
+    }));
+  }
+
   renderStartButton() {
     const { playerName } = this.props.match.params;
     const label = `Start as ${playerName.substring(0, 1).toUpperCase()}${playerName.substring(1)} `;
 
     return (
-      <button type="button" className="nes-btn">{label}</button>
+      <button type="button" onClick={this.handleStartPressed} className="nes-btn">{label}</button>
     )
   }
 

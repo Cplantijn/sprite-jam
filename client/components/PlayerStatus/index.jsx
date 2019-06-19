@@ -3,7 +3,7 @@ import { Sprite } from 'react-konva';
 import loadImages from '~helpers/loadImages';
 
 export default class PlayerStatus extends React.PureComponent {
-  state = { imagesLoaded: false, playerActive: false };
+  state = { imagesLoaded: false };
 
   async componentDidMount() {
     await loadImages([`/assets/images/${this.props.name}_sprites.png`]);
@@ -21,7 +21,7 @@ export default class PlayerStatus extends React.PureComponent {
         x={this.props.x + 102}
         y={this.props.y + 10}
         image={img}
-        animation={this.state.playerActive ? 'active' : 'disabled'}
+        animation={this.props.active ? 'active' : 'disabled'}
         animations={{
           active: [0, 0, 86, 86],
           disabled: [86, 0, 86, 86]

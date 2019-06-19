@@ -8,5 +8,6 @@ export default {
     // { name: 'blanka' }
   ],
   ANGRY_BLOCK_COLUMNS: 14,
-  FLOOR_RATIO_FROM_TOP: 0.7777777778
+  FLOOR_RATIO_FROM_TOP: 0.7777777778,
+  WS_ADDRESS: 'ws://localhost:8082'
 };

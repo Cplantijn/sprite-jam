@@ -33,7 +33,7 @@ export default class PlayerSprite extends React.PureComponent {
           y: 2.5
         }}
         image={img}
-        animation="strikingRight"
+        animation="idleFacingRight"
         animations={{
           idleFacingRight: getSpriteGridPositions(1, 4),
           idleFacingLeft: getSpriteGridPositions(2, 4),
@@ -48,27 +48,6 @@ export default class PlayerSprite extends React.PureComponent {
         }}
         frameRate={5}
       />
-    )
-
-    // return (
-    //   <Sprite
-    //     ref={this.spriteRef}
-    //     x={172}
-    //     y={82}
-    //     image={img}
-    //     animation="standing"
-    //     animations={{
-    //       standing: [
-    //         0, 0, 86, 164,
-    //         86, 0, 86, 164,
-    //         172, 0, 86, 164,
-    //         258, 0, 86, 164
-    //       ]
-    //     }}
-    //     frameRate={6}
-    //     frameIndex={0}
-    //   />
-    // )
-
+    );
   }
 }
