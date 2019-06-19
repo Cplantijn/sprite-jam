@@ -44,7 +44,7 @@ export default class GameStage extends React.PureComponent {
     switch(msg.action) {
       case actions.PLAYER_READY:
         this.setState(prevState => {
-          if (!prevState.players.find(player => player.name === msg.playerName)) {
+          if (!prevState.gameIsActive && !prevState.players.find(player => player.name === msg.playerName)) {
             return {
               ...prevState,
               players: prevState.players.concat([{
