@@ -15,10 +15,17 @@ const BLOCK_STATES = {
 };
 
 export default class AngryBlockRow extends React.PureComponent {
+  springRef = React.createRef();
+  floorYPosition = 0;
+  widthPerBlock = 0;
+  hitDetected = false;
+  submittedHitDetection = false;
   state = { spritesLoaded: false, blocksState: BLOCK_STATES.CALM };
 
   async componentDidMount() {
     await loadImages(['/assets/images/angry_blocks.png']);
+    this.widthPerBlock = this.props.stageDimens.width / config.ANGRY_BLOCK_COLUMNS;
+    this.floorYPosition = (this.props.stageDimens.height * config.FLOOR_RATIO_FROM_TOP) - (this.widthPerBlock * WIDTH_TO_HEIGHT_RATIO);
     this.setState({ spritesLoaded: true }, this.props.onReady);
   }
 
@@ -43,10 +50,10 @@ export default class AngryBlockRow extends React.PureComponent {
 
   raiseRow = () => { this.setState({ blocksState: BLOCK_STATES.RISING }) };
 
-  handleRested = () => {
+  handleRested = ({ y }) => {
     const { blocksState } = this.state;
 
-    if (blocksState === BLOCK_STATES.FALLING) {
+    if (blocksState === BLOCK_STATES.FALLING && y === this.floorYPosition && !this.hitDetected) {
       this.props.onSlammed();
     } else if (blocksState === BLOCK_STATES.RISING) {
       this.setState({ blocksState: BLOCK_STATES.CALM }, this.props.onReady);
@@ -54,37 +61,45 @@ export default class AngryBlockRow extends React.PureComponent {
     return;
   }
 
-  getBlocksYPos = (blockHeight) => {
+  getBlocksYPos = () => {
     switch(this.state.blocksState) {
       case BLOCK_STATES.FALLING:
         const { stageDimens: { height: stageHeight } } = this.props;
-        return { y: (stageHeight * config.FLOOR_RATIO_FROM_TOP) - blockHeight};
+        return { y: this.floorYPosition };
       default:
         return { y: 0 }
+    }
+  }
+
+  handleOnFrame = ({y}) => {
+    if (y > (this.floorYPosition - (86 * config.PLAYER_SCALING) + 10) && !this.submittedHitDetection) {
+      this.props.onHitTreshold(this.widthPerBlock);
     }
   }
 
   render() {
     if (!this.state.spritesLoaded) return null;
     const { blocksState } = this.state;
-    const widthPerBlock = this.props.stageDimens.width / config.ANGRY_BLOCK_COLUMNS;
     
-    const img = new Image(widthPerBlock, (widthPerBlock * WIDTH_TO_HEIGHT_RATIO) * 3);
+    const img = new Image();
     img.src = '/assets/images/angry_blocks.png';
-    const scale =  widthPerBlock / 72;
+    const scale = this.widthPerBlock / 72;
 
     return (
       <Spring
+        ref={this.springRef}
         config={{
           ...springConfig.wobbly,
           duration: blocksState === BLOCK_STATES.RISING ? 2000 : 300
         }}
         from={{ y: 0 }}
-        to={this.getBlocksYPos(widthPerBlock * WIDTH_TO_HEIGHT_RATIO)}
+        to={this.getBlocksYPos()}
         onRest={this.handleRested}
+        onFrame={this.handleOnFrame}
       >
         {animProps => {
           const blocks = [];
+
           for (let i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
             if (!this.props.holes.includes(i)) {
               blocks.push(
@@ -95,7 +110,7 @@ export default class AngryBlockRow extends React.PureComponent {
                     y: scale
                   }}
                   {...animProps}
-                  x={widthPerBlock * i}
+                  x={this.widthPerBlock * i}
                   image={img}
                   animation={this.getCurrentBlockAnimation()}
                   animations={{

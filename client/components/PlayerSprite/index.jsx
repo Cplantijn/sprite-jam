@@ -19,7 +19,6 @@ export default class PlayerSprite extends React.PureComponent {
 
   getAnimationName = () => {
     const actionSuffix = this.props.player.moveState.facing === actions.FACING_LEFT ? 'Left' : 'Right';
-    console.log('ACTION:', this.props.player.moveState.action);
 
     switch(this.props.player.moveState.action) {
       case actions.MOVE_LEFT:
@@ -45,10 +44,10 @@ export default class PlayerSprite extends React.PureComponent {
       <Sprite
         ref={this.spriteRef}
         x={this.props.player.moveState.position}
-        y={(stageHeight * config.FLOOR_RATIO_FROM_TOP) - 215}
+        y={(stageHeight * config.FLOOR_RATIO_FROM_TOP) - (86 * config.PLAYER_SCALING)}
         scale={{
-          x: 2.5,
-          y: 2.5
+          x: config.PLAYER_SCALING,
+          y: config.PLAYER_SCALING
         }}
         image={img}
         animation={this.getAnimationName()}

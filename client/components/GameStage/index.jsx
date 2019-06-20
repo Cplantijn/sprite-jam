@@ -7,6 +7,8 @@ import actions from '~constants/actions';
 import AngryBlockRow from '~components/AngryBlockRow';
 import StageBackground from '~components/StageBackground';
 import getRandomHolePositions from '~helpers/getRandomHolePositions';
+import getSafeBands from '~helpers/getSafeBands';
+import getPlayerPerceivedBounds from '~helpers/getPlayerPerceivedBounds';
 
 export default class GameStage extends React.PureComponent {
   socket = new WebSocket(config.WS_ADDRESS);
@@ -59,12 +61,16 @@ export default class GameStage extends React.PureComponent {
 
   calculateNextPosition = (position, direction) => {
       const nextPosition = position + (6 * (direction === 'LEFT' ? -1 : 1 ));
-
+      const { start: nextPerceivedStart, end: nextPerceivedEnd } = getPlayerPerceivedBounds(nextPosition);
+      const { start: startBounds } = getPlayerPerceivedBounds(0);
+      const { end: endBounds } = getPlayerPerceivedBounds(this.state.width);
+      
       if (direction === 'LEFT') {
-        return nextPosition > -43 ? nextPosition : -43;
+        const adjustedStartBounds = startBounds * -1;
+        return nextPosition > adjustedStartBounds ? nextPosition : position;
       }
-
-      return nextPosition < this.state.width - 172 ? nextPosition : this.state.width - 172;
+      
+      return nextPerceivedEnd < this.state.width ? nextPosition : position;
   }
 
   moveCharacter = (name, direction) => {
@@ -119,7 +125,7 @@ export default class GameStage extends React.PureComponent {
                 moveState: {
                   facing: actions.FACING_RIGHT,
                   action: actions.STOP,
-                  position: 10,
+                  position: (Math.random() * ((this.state.width * .8 - this.state.width * .2) + 1)) + this.state.width * .2,
                 }
               }])
             }
@@ -164,32 +170,19 @@ export default class GameStage extends React.PureComponent {
             }
 
             return player;
-          })
+        })
         }));
       default:
         // NADA
     }
   }
 
-  handleResize = () => {
+Resize = () => {
     this.setState({
       height: window.innerHeight > config.MIN_SCREEN_HEIGHT - 1 ? window.innerHeight : config.MIN_SCREEN_HEIGHT,
       width: window.innerWidth > config.MIN_SCREEN_WIDTH - 1 ? window.innerWidth : config.MIN_SCREEN_WIDTH
-    })
+  })
   }
-
-  // drawBackground = () => {
-  //   const canvasRef = sq(this.backgroundLayer, _ => _.current.canvas);
-  //   if (!canvasRef) return;
-
-  //   const backgroundImage = new Image();
-  //   backgroundImage.src = '/assets/images/background.png';
-
-  //   backgroundImage.addEventListener('load', () => {
-  //     const canvasCtx = canvasRef.getContext('2d');
-  //     canvasCtx.drawImage(backgroundImage, 0, 0, canvasRef.width, canvasRef.height);
-  //   });
-  // }
 
   handleAngryBlocksReady = () => {
     this.setState(prevState => {
@@ -203,12 +196,33 @@ export default class GameStage extends React.PureComponent {
       return prevState;
     }, () => {
       if (this.state.gameIsActive) {
-        setTimeout(this.angryBlockRowRef.current.dropRow, 2000)
+        this.angryBlockRowRef.current.submittedHitDetection = false;
+        setTimeout(this.angryBlockRowRef.current.dropRow, 2000);
       }
     });
   }
 
-  handleAngryBlocksSlammed = () => setTimeout(this.angryBlockRowRef.current.raiseRow, 1000);
+  onAngryBlocksRequestCollisionCheck = (widthPerBlock) => {
+    this.angryBlockRowRef.current.submittedHitDetection = true;
+    const safeXBands = getSafeBands(this.state.blockHoles, widthPerBlock);
+
+    const hitPlayers = this.state.players.filter(player => {
+      return !safeXBands.some(band => {
+        const { start: playerStart, end: playerEnd } = getPlayerPerceivedBounds(player.moveState.position);
+        console.log({ playerStart, playerEnd, band });
+        return band.start <= playerStart && band.end >= playerEnd;
+      });
+    });
+
+    if (hitPlayers.length) {
+      this.angryBlockRowRef.current.hitDetected = true;
+      this.angryBlockRowRef.current.springRef.current.stop();
+    }
+  }
+
+  handleAngryBlocksSlammed = () => {
+    setTimeout(this.angryBlockRowRef.current.raiseRow, 1000);
+  }
 
   renderPlayerSprites = () => {
     const stageDimens = { height: this.state.height, width: this.state.width };
@@ -243,6 +257,7 @@ export default class GameStage extends React.PureComponent {
             stageDimens={stageDimens}
             onReady={this.handleAngryBlocksReady}
             onSlammed={this.handleAngryBlocksSlammed}
+            onHitTreshold={this.onAngryBlocksRequestCollisionCheck}
           />
         </Layer>
         <Layer>

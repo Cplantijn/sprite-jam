@@ -1,5 +1,6 @@
 import React from 'react';
-import {Sprite} from 'react-konva';
+import { Sprite } from 'react-konva';
+import config from '~config';
 import loadImages from '~helpers/loadImages';
 
 const IMG_HEIGHT = 1080;
@@ -10,7 +11,7 @@ export default class StageBackground extends React.PureComponent {
   state = { spriteLoaded: false };
 
   async componentDidMount() {
-    await loadImages(['/assets/images/background-haunted.png']);
+    await loadImages([`/assets/images/background-${config.GAME_STAGE}.png`]);
 
     this.setState({ spriteLoaded: true }, () => {
       this.backgroundRef.current.start();
@@ -20,7 +21,7 @@ export default class StageBackground extends React.PureComponent {
   render() {
     if (!this.state.spriteLoaded) return null;
     const backgroundImg = new Image();
-    backgroundImg.src = '/assets/images/background-haunted.png';
+    backgroundImg.src = `/assets/images/background-${config.GAME_STAGE}.png`;
 
     return (
       <Sprite

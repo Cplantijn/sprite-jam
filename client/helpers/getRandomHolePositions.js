@@ -11,7 +11,7 @@ function* getHole(arr) {
 export default function(numHoles) {
   const angryColumns = [];
   const holes = [];
-  // return [0, 12];
+
   for (var i = 0; i < config.ANGRY_BLOCK_COLUMNS; i++) {
     angryColumns.push(i);
   }

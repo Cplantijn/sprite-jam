@@ -19,14 +19,13 @@ export default class PlayerStatus extends React.PureComponent {
           height={26}
           x={this.props.x + 96}
           y={this.props.y + 100}
-          cornerRadius={4}
-          fill="red"
-        />
+          fill="#d3d3d3"
+  />
         <Text
           x={this.props.x + 102}
           y={this.props.y + 104}
           text="Not Ready"
-          fill="white"
+          fill="black"
           fontSize={18}
         />
       </React.Fragment>
@@ -41,6 +40,16 @@ export default class PlayerStatus extends React.PureComponent {
 
     return (
       <React.Fragment>
+        {this.props.player && (
+          <Rect
+            x={this.props.x + 96}
+            y={this.props.y + 5}
+            width={100}
+            height={100}
+            fill="white"
+            cornerRadius={6}
+          />
+        )}
         <Sprite
           x={this.props.x + 102}
           y={this.props.y + 10}
