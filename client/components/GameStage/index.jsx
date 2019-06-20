@@ -24,7 +24,7 @@ export default class GameStage extends React.PureComponent {
   };
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize, false);
+      window.addEventListener('resize', this.handle, false);
     this.socket.addEventListener('message', this.handleWsMessage);
     this.socket.addEventListener('open', () => {
       this.socket.send(JSON.stringify({
@@ -122,10 +122,13 @@ export default class GameStage extends React.PureComponent {
               players: prevState.players.concat([{
                 name: msg.playerName,
                 isReady: false,
+                movementAllowed: true,
+                lives: config.STARTING_LIVES,
+                exploding: false,
                 moveState: {
                   facing: actions.FACING_RIGHT,
                   action: actions.STOP,
-                  position: (Math.random() * ((this.state.width * .8 - this.state.width * .2) + 1)) + this.state.width * .2,
+                  position: Math.random() * (this.state.width * .8 - this.state.width * .2) + (this.state.width * .2),
                 }
               }])
             }
@@ -147,7 +150,7 @@ export default class GameStage extends React.PureComponent {
         this.setState(prevState => ({
           ...prevState,
           players: prevState.players.map(player => {
-            if (player.name === msg.playerName) {
+            if (player.name === msg.playerName && player.movementAllowed) {
               clearInterval(this.moveIntervals[player.name]);
               let facing = player.moveState.facing;
 
@@ -177,11 +180,11 @@ export default class GameStage extends React.PureComponent {
     }
   }
 
-Resize = () => {
+  handleResize = () => {
     this.setState({
       height: window.innerHeight > config.MIN_SCREEN_HEIGHT - 1 ? window.innerHeight : config.MIN_SCREEN_HEIGHT,
       width: window.innerWidth > config.MIN_SCREEN_WIDTH - 1 ? window.innerWidth : config.MIN_SCREEN_WIDTH
-  })
+    })
   }
 
   handleAngryBlocksReady = () => {
@@ -206,21 +209,58 @@ Resize = () => {
     this.angryBlockRowRef.current.submittedHitDetection = true;
     const safeXBands = getSafeBands(this.state.blockHoles, widthPerBlock);
 
-    const hitPlayers = this.state.players.filter(player => {
+    const hitPlayerNames = this.state.players.filter(player => {
       return !safeXBands.some(band => {
         const { start: playerStart, end: playerEnd } = getPlayerPerceivedBounds(player.moveState.position);
-        console.log({ playerStart, playerEnd, band });
         return band.start <= playerStart && band.end >= playerEnd;
       });
-    });
+    }).map(p => p.name);
 
-    if (hitPlayers.length) {
+    if (hitPlayerNames.length) {
       this.angryBlockRowRef.current.hitDetected = true;
-      this.angryBlockRowRef.current.springRef.current.stop();
+
+      this.setState(prevState => ({
+        ...prevState,
+        players: prevState.players.map(player => {
+          if (hitPlayerNames.includes(player.name)) {
+            clearInterval(this.moveIntervals[player.name]);
+
+            return {
+              ...player,
+              movementAllowed: false,
+              lives: player.lives - 1,
+              exploding: true
+            };
+          }
+        })
+      }), () => {
+        // Give time for explosion animation
+        setTimeout(() => {
+          this.setState(prevState => ({
+            ...prevState,
+            players: prevState.players.map(player => ({
+              ...player,
+              movementAllowed: true,
+              exploding: false
+            }))
+          }), () => {
+            this.removeDeadCharacters();
+          })
+        }, 3000);
+        this.handleAngryBlocksSlammed();
+      })
     }
   }
 
+  removeDeadCharacters = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      players: prevState.players.filter(p => p.lives)
+    }));
+  }
+
   handleAngryBlocksSlammed = () => {
+    this.angryBlockRowRef.current.hitDetected = false;
     setTimeout(this.angryBlockRowRef.current.raiseRow, 1000);
   }
 

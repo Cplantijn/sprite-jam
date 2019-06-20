@@ -7,9 +7,10 @@ export default {
     // { name: 'keanu' },
     // { name: 'blanka' }
   ],
-  ANGRY_BLOCK_COLUMNS: 20,
+  ANGRY_BLOCK_COLUMNS: 16,
   FLOOR_RATIO_FROM_TOP: 0.7777777778,
   PLAYER_SCALING: 2.5,
   WS_ADDRESS: 'ws://localhost:8082',
-  GAME_STAGE: 'haunted'
+  GAME_STAGE: 'haunted',
+  STARTING_LIVES: 3
 };
