@@ -3,14 +3,20 @@ export default {
   MIN_SCREEN_HEIGHT: 800,
   PLAYERS: [
     { name: 'ryu' },
-    // { name: 'ken' },
-    // { name: 'keanu' },
-    // { name: 'blanka' }
+    { name: 'ken' },
+    // { name: 'ryu' },
+    // { name: 'ryu' }
   ],
   ANGRY_BLOCK_COLUMNS: 16,
   FLOOR_RATIO_FROM_TOP: 0.7777777778,
   PLAYER_SCALING: 2.5,
   WS_ADDRESS: 'ws://localhost:8082',
   GAME_STAGE: 'haunted',
-  STARTING_LIVES: 3
+  STARTING_LIVES: 2,
+  BLINK_DISTANCE: 400,
+  BLINK_COOLDOWN: 5000,
+  VICTIM_THROW_DISTANCE: 200,
+  VICTIM_STUN_DURATION: 400,
+  MIN_BLOCK_DROP_TIME: 5000,
+  MAX_BLOCK_DROP_TIME: 10000
 };

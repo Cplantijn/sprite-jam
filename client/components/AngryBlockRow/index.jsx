@@ -20,6 +20,7 @@ export default class AngryBlockRow extends React.PureComponent {
   widthPerBlock = 0;
   hitDetected = false;
   submittedHitDetection = false;
+  submittedClearedOfPlayersPosition = false;
   state = { spritesLoaded: false, blocksState: BLOCK_STATES.CALM };
 
   async componentDidMount() {
@@ -44,7 +45,7 @@ export default class AngryBlockRow extends React.PureComponent {
     this.setState({ blocksState: BLOCK_STATES.ANGRY }, () => {
       setTimeout(() => {
         this.setState({ blocksState: BLOCK_STATES.FALLING });
-      }, 1500);
+      }, 1000);
     })
   }
 
@@ -72,8 +73,12 @@ export default class AngryBlockRow extends React.PureComponent {
   }
 
   handleOnFrame = ({y}) => {
-    if (y > (this.floorYPosition - (86 * config.PLAYER_SCALING) + 10) && !this.submittedHitDetection) {
-      this.props.onHitTreshold(this.widthPerBlock);
+    const hitPlayersThreshold = this.floorYPosition - (86 * config.PLAYER_SCALING) + 10;
+
+    if (y > hitPlayersThreshold && !this.submittedHitDetection) {
+      this.props.onHitTreshold();
+    } else if (this.state.blocksState === BLOCK_STATES.RISING && !this.submittedClearedOfPlayersPosition && y < hitPlayersThreshold) {
+      this.props.onPlayerClearThreshold();
     }
   }
 

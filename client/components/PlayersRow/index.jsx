@@ -1,7 +1,6 @@
 import React from 'react';
 import config from '~config';
 import PlayerStatus from '~components/PlayerStatus';
-import { Text } from 'react-konva';
 
 const DARK_BOTTOM_RATIO = 0.145; // Black area at bottom of screen
 

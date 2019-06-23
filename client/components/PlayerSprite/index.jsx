@@ -12,7 +12,8 @@ export default class PlayerSprite extends React.PureComponent {
   async componentDidMount() {
     await loadImages([
       `/assets/images/${this.props.player.name}_sprites.png`,
-      '/assets/images/boom.png'
+      '/assets/images/boom.png',
+      '/assets/images/blink.png'
     ]);
 
     this.setState({ spritesLoaded: true }, () => {
@@ -28,23 +29,34 @@ export default class PlayerSprite extends React.PureComponent {
       case actions.MOVE_RIGHT:
         return `walking${actionSuffix}`;
       case actions.STOP:
+      case actions.BLINK_LEFT:
+      case actions.BLINK_RIGHT:
         return `idleFacing${actionSuffix}`;
       case actions.ATTACK:
         return `striking${actionSuffix}`;
+      case actions.RECEIVE_STRIKE:
+        return `victimFacing${actionSuffix}`;
       default:
-        return 'victimFacingLeft';
+        return `idleFacing${actionSuffix}`;
     }
   }
 
   render() {
-    console.log('REANDER')
     if (!this.state.spritesLoaded) return null;
     const { stageDimens: { height: stageHeight }} = this.props;
 
     const img = new Image();
     let animation, animations, frameRate, scaling, y, x;
 
-    if (this.props.player.exploding) {
+    if ([actions.BLINK_LEFT, actions.BLINK_RIGHT].includes(this.props.player.moveState.action)) {
+      img.src = '/assets/images/blink.png';
+      animation = 'blink';
+      animations = { blink: getSpriteGridPositions(0, 8)};
+      frameRate = 40;
+      scaling = config.PLAYER_SCALING * .75;
+      x = this.props.player.moveState.position;
+      y = (stageHeight * config.FLOOR_RATIO_FROM_TOP) - (86 * config.PLAYER_SCALING);
+    } else if (this.props.player.exploding) {
       img.src = '/assets/images/boom.png';
       animation = 'blowup';
 
@@ -79,7 +91,7 @@ export default class PlayerSprite extends React.PureComponent {
       scaling = config.PLAYER_SCALING;
       x = this.props.player.moveState.position;
       y = (stageHeight * config.FLOOR_RATIO_FROM_TOP) - (86 * config.PLAYER_SCALING)
-      frameRate = 6;
+      frameRate = ['strikingRight', 'strikingLeft'].includes(animation) ? 12 : 8;
     }
     
     return (

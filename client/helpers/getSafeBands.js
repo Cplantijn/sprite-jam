@@ -1,5 +1,3 @@
-import config from '~config';
-
 const getContiguousBands = (bands) => {
   const contiguousBands = [];
 
@@ -22,7 +20,7 @@ const getContiguousBands = (bands) => {
   return contiguousBands;
 }
 
-export default function (holePositions, widthPerBlock) {
+export const getBlockAngryBlockSafeBands = (holePositions, widthPerBlock) => {
   holePositions.sort((a, b) => a > b ? 1 : -1);
 
   const rawPositions = holePositions.map(holePosition => ({
@@ -33,3 +31,5 @@ export default function (holePositions, widthPerBlock) {
 
   return getContiguousBands(rawPositions);
 }
+
+export const getOtherPlayerOccupiedBands = (otherPlayerPositions) => getContiguousBands(otherPlayerPositions);

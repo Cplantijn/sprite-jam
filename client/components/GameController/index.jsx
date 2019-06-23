@@ -11,11 +11,25 @@ import './GameController.scss';
 
 export default class GameController extends React.PureComponent {
   socket = new WebSocket(config.WS_ADDRESS);
-  state = { characterAvailable: null, attacking: false, playerClaimed: false, playerReady: false, gameActive: false };
+  checkForHostInterval = null;
+  doubleTapQueue = null;
+
+  state = {
+    hostConnected: false,
+    characterAvailable: null,
+    attacking: false,
+    playerClaimed: false,
+    playerReady: false,
+    gameActive: false,
+    readyAcknowledged: false
+  };
 
   componentWillMount() {
     this.socket.addEventListener('message', this.handleWsMessage);
     this.socket.addEventListener('open', () => {
+      this.checkForHost();
+      this.checkForHostInterval = setInterval(this.checkForHost, 3000);
+
       this.socket.send(JSON.stringify({
         playerName: this.props.match.params.playerName,
         action: actions.CHECK_PLAYER_AVAILABLE
@@ -25,6 +39,13 @@ export default class GameController extends React.PureComponent {
 
   componentWillUnmount() {
     this.socket.removeEventListener('message', this.handleWsMessage);
+    clearInterval(this.checkForHostInterval);
+  }
+
+  checkForHost = () => {
+    this.socket.send(JSON.stringify({
+      action: actions.CHECK_HOST
+    }));
   }
 
   handleWsMessage = (msgEvent) => {
@@ -45,6 +66,26 @@ export default class GameController extends React.PureComponent {
         this.setState({
           gameActive: true
         });
+        break;
+      case actions.HOST_STATUS_REPORT:
+        this.setState(prevState => ({
+          ...prevState,
+          hostConnected: msg.isActive,
+          playerClaimed: msg.isActive === false ? false : prevState.playerClaimed,
+          playerReady: msg.isActive === false ? false : prevState.playerReady,
+          gameActive: msg.isActive === false ? false : prevState.gameActive,
+          readyAcknowledged: msg.isActive === false ? false : prevState.readyAcknowledged
+        }));
+        break;
+      case actions.RESET_GAME:
+        this.setState({
+          playerReady: false,
+          readyAcknowledged: false,
+          gameActive: false
+        });
+        break;
+      case actions.ACK_PLAYER_READY:
+        this.setState({ readyAcknowledged: true })
         break;
       default:
         // Nada
@@ -100,19 +141,31 @@ export default class GameController extends React.PureComponent {
               action: actions.STOP
             }))
           })
-        }, 300)
+        }, 300);
       })
   }
 
   handleControllerAction = action => {
+    let actionToSend = action;
+
+    if (this.doubleTapQueue === action) {
+      if (action === actions.MOVE_LEFT) actionToSend = actions.BLINK_LEFT;
+      if (action === actions.MOVE_RIGHT) actionToSend = actions.BLINK_RIGHT;
+    } else if ([actions.MOVE_LEFT, actions.MOVE_RIGHT].includes(action)) {
+      this.doubleTapQueue = action;
+      setTimeout(() => { this.doubleTapQueue = null }, 225);
+    }
+
     this.socket.send(JSON.stringify({
       playerName: this.props.match.params.playerName,
-      action
-    }))
+      action: actionToSend
+    }));
   }
 
   renderControllerContent = () => {
-    if (this.state.characterAvailable === null) {
+    if (!this.state.hostConnected) {
+      return <h1 className="nes-text is-warning fat-message">Connection to host not found...</h1>
+    } else if (this.state.characterAvailable === null) {
       return <h1 className="nes-text is-primary fat-message">Checking if character is available....</h1>;
     } else if (this.state.characterAvailable === false) {
       return (
@@ -124,7 +177,7 @@ export default class GameController extends React.PureComponent {
 
     return (
       <div className="gamepad-controller flex-column flex-center">
-        {!this.state.gameActive && (
+        {(!this.state.gameActive && !this.state.readyAcknowledged) && (
           <div className="ready-container flex-center">
             {this.renderStartButton()}
           </div>

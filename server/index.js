@@ -46,14 +46,32 @@ wss.on('connection', function connection(ws) {
           action: actions.START_GAME
         });
         break;
+      case actions.CHECK_HOST:
+        ws.send(JSON.stringify({
+          action: actions.HOST_STATUS_REPORT,
+          isActive: !!sockets.HOST
+        }));
+        break;
       case actions.PLAYER_READY:
         sendToHost({
           action: actions.PLAYER_READY,
           playerName: msg.playerName
         });
         break;
+      case actions.ACK_PLAYER_READY:
+        sendToPlayer(msg.playerName, {
+          action: actions.ACK_PLAYER_READY
+        });
+        break;
+      case actions.RESET_GAME:
+        sendToPlayers({
+          action: actions.RESET_GAME
+        });
+        break;
       case actions.MOVE_LEFT:
       case actions.MOVE_RIGHT:
+      case actions.BLINK_LEFT:
+      case actions.BLINK_RIGHT:
       case actions.STOP:
       case actions.ATTACK:
         sendToHost({
@@ -78,7 +96,12 @@ wss.on('connection', function connection(ws) {
             playerName: socketKey.toLowerCase()
           });
         } else {
-          clearAllSockets();
+          sendToPlayers({
+            action: actions.HOST_STATUS_REPORT,
+            isActive: false
+          });
+
+          setTimeout(clearAllSockets, 20);
         }
       }
     }
@@ -108,4 +131,11 @@ function sendToPlayers(msg) {
       socket.send(JSON.stringify(msg));
     }
   } 
+}
+
+function sendToPlayer(playerName, msg) {
+  const playerKey = playerName.toUpperCase();
+  
+  if (!sockets[playerKey]) return;
+  sockets[playerKey].send(JSON.stringify(msg));
 }
