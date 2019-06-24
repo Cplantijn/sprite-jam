@@ -3,14 +3,14 @@ export default {
   MIN_SCREEN_HEIGHT: 800,
   PLAYERS: [
     { name: 'ryu' },
-    { name: 'ken' },
-    // { name: 'ryu' },
+    { name: 'deejay' },
+    { name: 'john' },
     // { name: 'ryu' }
   ],
   ANGRY_BLOCK_COLUMNS: 16,
   FLOOR_RATIO_FROM_TOP: 0.7777777778,
   PLAYER_SCALING: 2.5,
-  WS_ADDRESS: 'ws://localhost:8082',
+  WS_ADDRESS: 'ws://10.2.103.119:8082',
   GAME_STAGE: 'haunted',
   STARTING_LIVES: 2,
   BLINK_DISTANCE: 400,

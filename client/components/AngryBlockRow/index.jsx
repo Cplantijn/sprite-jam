@@ -43,6 +43,7 @@ export default class AngryBlockRow extends React.PureComponent {
   
   dropRow = () => {
     this.setState({ blocksState: BLOCK_STATES.ANGRY }, () => {
+      this.props.playSound('block_grunt');
       setTimeout(() => {
         this.setState({ blocksState: BLOCK_STATES.FALLING });
       }, 1000);

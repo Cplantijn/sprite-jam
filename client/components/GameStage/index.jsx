@@ -1,5 +1,6 @@
 import React from 'react';
 import { Stage, Layer } from 'react-konva';
+import { Howl } from 'howler';
 import PlayersRow from '~components/PlayersRow';
 import PlayerSprite from '~components/PlayerSprite';
 import config from '~config';
@@ -16,6 +17,8 @@ export default class GameStage extends React.PureComponent {
   angryBlockRowRef = React.createRef();
   victimTimeouts = {};
   moveIntervals = {};
+  soundEngine = null;
+  mainSoundThemeId = 0;
 
   state = {
     height: window.innerHeight > config.MIN_SCREEN_HEIGHT - 1 ? window.innerHeight : config.MIN_SCREEN_HEIGHT,
@@ -24,7 +27,7 @@ export default class GameStage extends React.PureComponent {
     players: [],
     gameIsActive: false,
     angryBlocksImpedeMovement: false,
-    winningPlayer: null
+    broadcastMessage: null
   };
 
   componentDidMount() {
@@ -35,6 +38,28 @@ export default class GameStage extends React.PureComponent {
         action: actions.CLAIM_GAME_HOST
       });
     });
+
+    this.soundEngine = new Howl({
+      src: ['/assets/sounds/JamSprites.ogg'],
+      sprite: {
+        attack: [ 0, 652.7437641723355 ],
+        blink: [ 2000, 793.1746031746032 ],
+        block_grunt: [ 4000, 767.2335600907028 ],
+        cheer: [ 6000, 4388.208616780044 ],
+        countdown_1: [ 12000, 624.3537414965986 ],
+        countdown_2: [ 14000, 520.3401360544219 ],
+        countdown_3: [ 16000, 558.8435374149653 ],
+        countdown_ready: [ 18000, 812.5850340136047 ],
+        defeated: [ 20000, 1055.102040816326 ],
+        explosion: [ 23000, 1483.514739229026 ],
+        game_end: [ 26000, 885.8503401360558 ],
+        go: [ 28000, 518.4353741496608 ],
+        guile_theme: [ 30000, 246073.4693877551 ],
+        ready: [ 278000, 843.2653061224755 ],
+        slam: [ 280000, 244.10430839003538 ],
+        victim: [ 282000, 464.92063492064517 ] 
+      }
+    })
   }
   
   componentWillUnmount() {
@@ -47,19 +72,55 @@ export default class GameStage extends React.PureComponent {
     this.setState(prevState => {
       const readyPlayers = prevState.players.filter(player => player.isReady);
 
-      if (readyPlayers.length < 2) return prevState;
-    
+      if (readyPlayers.length < 2) return prevState;      
       return {
         ...prevState,
         gameIsActive: true
       }
     }, () => {
       if (this.state.gameIsActive) {
-        this.socket.send(JSON.stringify({
-          action: actions.START_GAME
-        }));
+        this.soundEngine.play('countdown_ready');
+        
+        setTimeout(() => {
+          this.soundEngine.play('countdown_3');
+          this.setState({
+            broadcastMessage: '3'
+          }, () => {
+            setTimeout(() => {
+              this.soundEngine.play('countdown_2');
+              this.setState({
+                broadcastMessage: '2'
+              }, () => {
+                setTimeout(() => {
+                  this.soundEngine.play('countdown_1');
+                  this.setState({
+                    broadcastMessage: '1'
+                  }, () => {
+                    setTimeout(() => {
+                      this.soundEngine.play('go');
+                      this.setState({
+                        broadcastMessage: 'Go!',
+                        gameIsActive: true
+                      }, () => {
+                        this.socket.send(JSON.stringify({
+                          action: actions.START_GAME
+                        }));
 
-        this.handleAngryBlocksReady();
+                        this.mainSoundThemeId = this.soundEngine.play('guile_theme');
+                        this.handleAngryBlocksReady();
+                        setTimeout(() => {
+                          this.setState({
+                            broadcastMessage: null
+                          });
+                        }, 800)
+                      })
+                    }, 1000)
+                  })
+                }, 1000);
+              })
+            }, 1000);
+          })
+        }, 1500);
       }
     });
   }
@@ -68,7 +129,7 @@ export default class GameStage extends React.PureComponent {
     this.setState(prevState => ({
       blockHoles: [],
       gameIsActive: false,
-      winningPlayer: null,
+      broadcastMessage: null,
       angryBlocksImpedeMovement: false,
       players: prevState.players.map(player => ({
         ...player,
@@ -84,7 +145,7 @@ export default class GameStage extends React.PureComponent {
         }
       }))
     }), () => {
-        this.sendWsMessage({ action: actions.RESET_GAME })
+      this.sendWsMessage({ action: actions.RESET_GAME })
     })
   }
 
@@ -202,6 +263,7 @@ export default class GameStage extends React.PureComponent {
             playerName: msg.playerName
           });
 
+          this.soundEngine.play('ready');
           this.checkShouldStartGame();
         });
         break;
@@ -237,7 +299,8 @@ export default class GameStage extends React.PureComponent {
         break;
       case actions.ATTACK:
         let victimPlayer = null;
-        
+        this.soundEngine.play('attack');
+
         this.setState(prevState => {
           const actingPlayer = prevState.players.find(p => p.name === msg.playerName);
           const nearestPlayers = this.getNearestPlayers(prevState.players, actingPlayer.name);
@@ -262,6 +325,7 @@ export default class GameStage extends React.PureComponent {
           }
 
           if (victimPlayer) {
+            this.soundEngine.play('victim');
             clearInterval(this.moveIntervals[victimPlayer.name]);
             clearTimeout(this.victimTimeouts[victimPlayer.name]);
             this.throwVictim(victimPlayer, direction);
@@ -382,6 +446,8 @@ export default class GameStage extends React.PureComponent {
                     const nextPosition = this.calculateNextPosition(player.name, player.moveState.position, direction, config.BLINK_DISTANCE);
 
                     if (nextPosition !== player.moveState.position) {
+                      this.soundEngine.play('blink');
+
                       return {
                         ...player,
                         canBlink: false,
@@ -499,6 +565,7 @@ export default class GameStage extends React.PureComponent {
           ...prevState,
           players: prevState.players.map(player => {
             if (hitPlayerNames.includes(player.name)) {
+              this.soundEngine.play('explosion');
               clearInterval(this.moveIntervals[player.name]);
 
               return {
@@ -512,19 +579,36 @@ export default class GameStage extends React.PureComponent {
           })
         }), () => {
           // Give time for explosion animation
-          setTimeout(() => {
-            this.setState(prevState => ({
+          this.state.players.forEach(p => {
+            if (p.lives === 0 && p.moveState.position <= this.state.width * 1.25) {
+              this.soundEngine.play('defeated');
+            }
+          });
+
+          this.setState(prevState =>{
+            const livePlayers = prevState.players.filter(p => p.lives > 0);
+            if (livePlayers.length > 1) return prevState;
+
+            return {
               ...prevState,
-              players: prevState.players.map(player => ({
-                ...player,
-                movementAllowed: true,
-                exploding: false
-              }))
-            }), () => {
-              this.moveDeadCharactersOffscreen();
-            })
-          }, 3000);
-          this.handleAngryBlocksSlammed();
+              gameIsActive: false,
+            }
+          }, () => {
+            setTimeout(() => {
+              this.setState(prevState => ({
+                ...prevState,
+                players: prevState.players.map(player => ({
+                  ...player,
+                  movementAllowed: true,
+                  exploding: false
+                }))
+              }), () => {
+                this.moveDeadCharactersOffscreen();
+              })
+            }, 3000);
+
+            this.handleAngryBlocksSlammed();
+          })
         })
       }
     });
@@ -533,18 +617,28 @@ export default class GameStage extends React.PureComponent {
   checkWinCondition = () => {
     const alivePlayers = this.state.players.filter(p => p.lives > 0);
 
-    if (alivePlayers.length === 1) {
-      this.setState(prevState => ({
-        gameIsActive: false,
-        winningPlayer: `${alivePlayers[0].name.substring(0, 1).toUpperCase()}${alivePlayers[0].name.substring(1)}`,
-        players: prevState.players.map(player => ({
-          ...player,
-          canMove: false,
-          canBlink: false
-        }))
-      }), () => {
-        setTimeout(this.resetGameState, 5000);
-      })
+    if (alivePlayers.length <= 1) {
+      this.soundEngine.stop(this.mainSoundThemeId);
+      this.soundEngine.play('game_end');
+
+      setTimeout(() => {
+        const broadcastMessage = alivePlayers[0] ? `${alivePlayers[0].name.substring(0, 1).toUpperCase()}${alivePlayers[0].name.substring(1)} wins!` : 'Everybody died!';
+
+        this.setState(prevState => ({
+          broadcastMessage,
+          players: prevState.players.map(player => ({
+            ...player,
+            canMove: false,
+            canBlink: false
+          }))
+        }), () => {
+          setTimeout(() => {
+            this.soundEngine.play('cheer');
+          }, 1200);
+
+          setTimeout(this.resetGameState, 5000);
+        })
+      }, 1500);
     }
   }
 
@@ -558,6 +652,8 @@ export default class GameStage extends React.PureComponent {
             movementAllowed: false,
             moveState: {
               ...player.moveState,
+              action: actions.STOP,
+              facing: actions.FACING_RIGHT,
               position: prevState.width * 3
             }
           }
@@ -565,10 +661,13 @@ export default class GameStage extends React.PureComponent {
 
         return player;
       })
-    }), this.checkWinCondition);
+    }), () => {
+      setTimeout(this.checkWinCondition, 1000);
+    });
   }
 
   handleAngryBlocksSlammed = () => {
+    this.soundEngine.play('slam');
     this.angryBlockRowRef.current.hitDetected = false;
     setTimeout(this.angryBlockRowRef.current.raiseRow, 1000);
   }
@@ -585,16 +684,18 @@ export default class GameStage extends React.PureComponent {
   }
   
   renderBroadCastMessage = () => {
-    if (this.state.winningPlayer === null) return null;
-    if (this.state.winningPlayer) {
+    if (this.state.broadcastMessage === null) return null;
+    if (this.state.broadcastMessage) {
       return (
         <div className="broadcast-message-container">
-          <h1>{this.state.winningPlayer} wins!</h1>
+          <h1>{this.state.broadcastMessage}</h1>
         </div>
       );
     }
 
   }
+
+  playSound = sound => this.soundEngine.play(sound);
 
   render() {
     const stageDimens = { height: this.state.height, width: this.state.width };
@@ -618,6 +719,7 @@ export default class GameStage extends React.PureComponent {
               holes={this.state.blockHoles}
               stageDimens={stageDimens}
               onReady={this.handleAngryBlocksReady}
+              playSound={this.playSound}
               onSlammed={this.handleAngryBlocksSlammed}
               onHitTreshold={this.onAngryBlocksRequestCollisionCheck}
               onPlayerClearThreshold={this.onAngryBlocksClearOfPlayersThreshold}

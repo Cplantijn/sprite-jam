@@ -208,7 +208,7 @@ export default class GameController extends React.PureComponent {
   }
 
   render() {
-    if (!['ryu', 'john', 'blanka', 'ken'].includes(this.props.match.params.playerName.toLowerCase())) {
+    if (!['ryu', 'john', 'deejay'].includes(this.props.match.params.playerName.toLowerCase())) {
       return <Redirect to="/" />
     }
 
