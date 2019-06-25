@@ -67,6 +67,9 @@ export default class GameController extends React.PureComponent {
           gameActive: true
         });
         break;
+      case actions.PLAYER_KILLED:
+        window.navigator.vibrate && window.navigator.vibrate(500);
+        break;
       case actions.HOST_STATUS_REPORT:
         this.setState(prevState => ({
           ...prevState,

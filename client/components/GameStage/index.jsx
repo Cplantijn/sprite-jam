@@ -40,7 +40,7 @@ export default class GameStage extends React.PureComponent {
     });
 
     this.soundEngine = new Howl({
-      src: ['/assets/sounds/JamSprites.ogg'],
+      src: ['/assets/sounds/JamSprites.mp3'],
       sprite: {
         attack: [ 0, 652.7437641723355 ],
         blink: [ 2000, 793.1746031746032 ],
@@ -72,7 +72,8 @@ export default class GameStage extends React.PureComponent {
     this.setState(prevState => {
       const readyPlayers = prevState.players.filter(player => player.isReady);
 
-      if (readyPlayers.length < 2) return prevState;      
+      if (readyPlayers.length < 2 || readyPlayers.length !== prevState.players.length) return prevState;
+
       return {
         ...prevState,
         gameIsActive: true
@@ -520,7 +521,7 @@ export default class GameStage extends React.PureComponent {
       if (prevState.gameIsActive) {
         return {
           ...prevState,
-          blockHoles: getRandomHolePositions(4)
+          blockHoles: getRandomHolePositions(config.BLOCK_HOLES_AMOUNT)
         }
       }
 
@@ -567,7 +568,7 @@ export default class GameStage extends React.PureComponent {
             if (hitPlayerNames.includes(player.name)) {
               this.soundEngine.play('explosion');
               clearInterval(this.moveIntervals[player.name]);
-
+              this.sendWsMessage({action: actions.PLAYER_KILLED, playerName: player.name });
               return {
                 ...player,
                 movementAllowed: false,

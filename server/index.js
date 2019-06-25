@@ -68,6 +68,11 @@ wss.on('connection', function connection(ws) {
           action: actions.RESET_GAME
         });
         break;
+      case actions.PLAYER_KILLED:
+        sendToPlayer(msg.playerName, {
+          action: actions.PLAYER_KILLED
+        });
+        break;
       case actions.MOVE_LEFT:
       case actions.MOVE_RIGHT:
       case actions.BLINK_LEFT:
