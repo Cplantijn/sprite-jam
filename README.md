@@ -14,9 +14,9 @@ One computer (hopefully a common one where all players have a view of) connects 
 Players pick a character on the mobile device to play at `localhost:8080/:playerName` where `:playerName` can be `ryu`, `deejay`, or `john`.
 
 ## How to Play
-<img width="200" src="./doc/controller.png" alt="Controller Screen" />
-<img width="200" src="./doc/starting_screen.png" alt="Starting out" />
-<img width="200" src="./doc/dead_players.png" alt="Dead Players" />
+<img width="800" src="./doc/controller.png" alt="Controller Screen" />
+<img width="800" src="./doc/starting_screen.png" alt="Starting out" />
+<img width="800" src="./doc/dead_players.png" alt="Dead Players" />
 
 The objective of the game is to survive the falling blocks which will fall randomly between the `MIN_BLOCK_DROP_TIME` and `MAX_BLOCK_DROP_TIME` (ms) located in the config at `client/config.js`.
 
