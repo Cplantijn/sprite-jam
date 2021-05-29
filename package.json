@@ -19,7 +19,7 @@
     "react-device-detect": "^1.6.2",
     "react-responsive": "^7.0.0",
     "squeeze-js": "^1.0.3",
-    "ws": "^7.0.1"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
